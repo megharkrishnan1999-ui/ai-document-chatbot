@@ -13,6 +13,8 @@ venv/
 # IDE
 .vscode/
 
+.env
+
 uploads/
 
 # OS
