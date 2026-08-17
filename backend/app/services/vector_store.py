@@ -1,8 +1,8 @@
 import chromadb
 
-#creates a persistent ChromaDB database.
+# Persistent ChromaDB database
 client = chromadb.PersistentClient(path="./chroma_db")
-#Give me the documents collection. If it doesn't exist, create it
+
 collection = client.get_or_create_collection(
     name="documents"
 )
@@ -21,6 +21,7 @@ def add_documents(
         metadatas=metadatas,
     )
 
+
 def search_documents(
     query_embedding: list[float],
     n_results: int = 3,
@@ -31,10 +32,43 @@ def search_documents(
     )
 
     return results
+
+
+def get_all_documents():
+    """
+    Return all stored document chunks and metadata.
+    """
+    return collection.get(
+        include=["metadatas"]
+    )
+
+
+def delete_document(filename: str):
+    """
+    Delete all chunks belonging to a specific PDF.
+    """
+
+    results = collection.get(
+        where={
+            "filename": filename
+        },
+        include=["metadatas"]
+    )
+
+    ids = results["ids"]
+
+    if ids:
+        collection.delete(ids=ids)
+
+    return len(ids)
+
+
 def reset_collection():
     global collection
 
-    client.delete_collection(name="documents")
+    client.delete_collection(
+        name="documents"
+    )
 
     collection = client.get_or_create_collection(
         name="documents"
